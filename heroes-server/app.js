@@ -8,11 +8,11 @@ const send = require('koa-send');
 const json = require('koa-json');
 const cors = require('koa-cors');
 
-const mongo_url = "mongodb://localhost:27017/TourOfHeroes";
+const mongo_url = "mongodb://localhost:27017/QuestWich";
 const monk = require('monk');
 const wrap = require('co-monk');
 const db = monk(mongo_url);
-const heroes = wrap(db.get('heroes'));
+const heroes = wrap(db.get('quests'));
 const counters = wrap(db.get('counters'));
 
 const app = koa();
@@ -39,19 +39,19 @@ let getNextSequence = function *(name) {
 //CRUD routes
 
 //Create
-router.post('/api/create-hero', koaBody, function *(){
+router.post('/api/create-quest', koaBody, function *(){
   this.body = yield heroes.insert({hid: yield getNextSequence('heroes'), name: this.request.body.name});
 });
 
 
 //Read
-router.get('/api/heroes', function *(){
+router.get('/api/quests', function *(){
   this.body = {data: yield heroes.find({}, '-_id')};
 });
 
 
 //Update
-router.put('/api/update-hero/:id', koaBody, function *(){
+router.put('/api/update-quest/:id', koaBody, function *(){
 
   let hid = parseInt(this.params.id);
   let heroName = this.request.body.name;
@@ -64,13 +64,13 @@ router.put('/api/update-hero/:id', koaBody, function *(){
 
 
 //Delete
-router.del('/api/delete-hero/:id', function *(){
+router.del('/api/delete-quest/:id', function *(){
   let hid = parseInt(this.params.id);
   this.body = yield heroes.remove({hid: hid});
 });
 
 //Search route
-router.get('/api/hero-search', koaBody, function *(){
+router.get('/api/quest-search', koaBody, function *(){
   let regexStr = `.*${this.query.name}.*`;
   let result = yield heroes.find({"name" : {$regex : regexStr}});
 
